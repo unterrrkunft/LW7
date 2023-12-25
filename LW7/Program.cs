@@ -6,12 +6,19 @@ public class TableReservationApp
 {
     static void Main(string[] args)
     {
-        TableReservationManager manager = new TableReservationManager();
-        manager.AddRestaurant("A", 10);
-        manager.AddRestaurant("B", 5);
+        try
+        {
+            TableReservationManager manager = new TableReservationManager();
+            manager.AddRestaurant("A", 10);
+            manager.AddRestaurant("B", 5);
 
-        Console.WriteLine(manager.BookTable("A", new DateTime(2023, 12, 25), 3)); // True
-        Console.WriteLine(manager.BookTable("A", new DateTime(2023, 12, 25), 3)); // False
+            Console.WriteLine(manager.BookTable("A", new DateTime(2023, 12, 25), 3)); // True
+            Console.WriteLine(manager.BookTable("A", new DateTime(2023, 12, 25), 3)); // False
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
 
@@ -41,12 +48,17 @@ public class TableReservationManager
     {
         var restaurant = Restaurants.FirstOrDefault(r => r.Name == restaurantName);
 
-        if (restaurant != null)
+        if (restaurant == null)
         {
-            return restaurant.BookTable(date, tableNumber);
+            throw new InvalidOperationException("Restaurant not found");
         }
 
-        throw new InvalidOperationException("Restaurant not found");
+        if (tableNumber < 0 || tableNumber >= restaurant.Tables.Count)
+        {
+            throw new ArgumentException("Invalid table number");
+        }
+
+        return restaurant.BookTable(date, tableNumber);
     }
 
     public void SortRestaurantsByAvailability(DateTime date)
